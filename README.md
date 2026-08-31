@@ -50,7 +50,7 @@ The only official source is <https://github.com/swapdesk/swapdesk>. Forks
 and mirrors are not vetted, and a build from one is not the build these
 checksums describe.
 
-- Compiled builds: <https://github.com/swapdesk/swapdesk/releases>
+- Compiled builds coming soon   : <https://github.com/swapdesk/swapdesk/releases>
 - From source:
 
 ```bash
