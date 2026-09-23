@@ -17,17 +17,7 @@ for what that does and does not protect you from.
 This is early software, and it handles real swap flows
 against real providers. An independent source-code security review of an
 earlier release found no critical issues (it predates the Chainflip,
-THORChain and Maya providers); a follow-up cross-provider audit of those
-four newer providers plus the SwapDesk API remote provider found two
-high-severity issues (the SwapDesk API provider was unconditionally
-blocked at the pre-flight gate; StealthEX had no chain disambiguation for
-USDC) and two medium-severity issues specific to Chainflip (a missing
-refund address wasn't caught until swap creation; the BaaS API sends
-credentials and addresses as URL query parameters, confirmed against
-Chainflip's own API reference to be a hard constraint of that API rather
-than a fixable oversight, and is now disclosed in the pre-flight check
-rather than left implicit) -- all four are fixed or, for the Chainflip
-query-string item, disclosed, see [CHANGELOG.md](docs/CHANGELOG.md).
+THORChain and Maya providers)
 One high-severity item has been closed: config.json can now be encrypted
 at rest with a master password (AES-256-GCM under a scrypt-derived key).
 Encryption is recommended and offered on first run; a plaintext store
