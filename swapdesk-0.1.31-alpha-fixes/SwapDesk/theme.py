@@ -16,51 +16,30 @@ import customtkinter as ctk
 
 import providers as prov
 
-
 BG = "#0b0d12"            # window background
-
 SURFACE = "#12151c"       # tab body / scroll areas
-
 CARD = "#171b23"          # card background
-
 CARD_HOVER = "#1f2530"
-
 BORDER = "#242a37"        # default 1px card border
-
 FIELD_BG = "#0e1117"      # entry / dropdown background (inset look)
-
 FIELD_BORDER = "#2a3141"
-
 ACCENT = "#f7931a"        # bitcoin orange, brand accent
-
 ACCENT_HOVER = "#dd830e"
-
 ACCENT_SOFT = "#3a2a14"   # accent tint for badges/pills
-
 GOOD = "#34d399"
-
 GOOD_SOFT = "#123226"
-
 BAD = "#ff6161"
-
 BAD_SOFT = "#301418"
-
 NEUTRAL_SOFT = "#232838"  # secondary-button surface
-
 TEXT = "#f3f4f6"
-
 MUTED = "#9aa2b1"
-
 FAINT = "#5c6272"
-
 RADIUS_LG = 18
-
 RADIUS_MD = 14
-
 RADIUS_SM = 10
 
 def _pick_family() -> str:
-    """"Segoe UI" only exists on Windows. Pick a native-feeling default per
+    """Segoe UI only exists on Windows. Pick a native-feeling default per
     OS, but verify it's actually installed (tkinter silently substitutes an
     ugly fallback otherwise) before trusting it, and fall back to Tk's own
     default UI font (which always exists) if not."""
@@ -84,7 +63,6 @@ def _pick_family() -> str:
             if name in available:
                 return name
     return "TkDefaultFont"  # always present; safe universal fallback
-
 FAMILY = _pick_family()
 
 def F(size: int, weight: str = "normal") -> ctk.CTkFont:
@@ -137,7 +115,6 @@ def full_str(d) -> str:
     if "." in s:
         s = s.rstrip("0").rstrip(".")
     return s or "0"
-
 STATUS_COLORS = {
     prov.STATUS_COMPLETE: GOOD,
     prov.STATUS_REFUNDED: ACCENT,
@@ -224,3 +201,5 @@ def checkbox(parent, text, variable, **kw):
 # follows alphabetically. Every entry must exist in providers.constants.COINS
 # or it silently never appears.
 POPULAR_COINS = ["BTC", "ETH", "XMR", "USDC", "LTC", "SOL", "DOGE", "DASH", "ZEC"]
+
+# Fixed by j2sec
