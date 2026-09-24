@@ -1,7 +1,6 @@
 """Reusable compound widgets for SwapDesk (the searchable CoinPicker)."""
 from __future__ import annotations
 
-
 import customtkinter as ctk
 
 from theme import *  # colours, fonts, entry(), POPULAR_COINS
@@ -28,8 +27,6 @@ class CoinPicker(ctk.CTkFrame):
         self._values: list[str] = list(values)
         self._names = names          # ticker -> display name, read live
         self._command = command
-        # An initial ticker the caller hardcoded (BTC/XMR) may not be
-        # unlocked yet. Only honour it when it is actually offered.
         self._value = self._first_offered(initial)
 
         self._var = ctk.StringVar(value=self._label_for(self._value))
@@ -113,3 +110,5 @@ class CoinPicker(ctk.CTkFrame):
             self._var.set(self._label_for(self._value))
         if kw:
             self._menu.configure(**kw)
+
+# Fixed by j2sec
