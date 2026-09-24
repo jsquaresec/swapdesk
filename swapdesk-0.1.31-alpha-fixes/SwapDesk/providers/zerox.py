@@ -1,6 +1,8 @@
 """providers.zerox: 0x (DEX) (v2): on-chain DEX aggregator (quote-only)."""
 from __future__ import annotations
 
+from decimal import Decimal
+
 import requests
 
 from .base import ProviderError, Quote, Swap, SwapProvider
@@ -70,7 +72,22 @@ class ZeroExDEX(SwapProvider):
                                f"(from dashboard.0x.org) to fetch quotes.")
         sell_addr, sell_dec = EVM_TOKENS[from_coin]
         buy_addr, _ = EVM_TOKENS[to_coin]
-        sell_amount = str(int(amount * (10 ** sell_dec)))
+        amount = _dec(amount)
+        if amount is None or amount <= 0:
+            return Quote(
+                self.name, from_coin, to_coin, amount, None, None,
+                error=f"{self.name}: amount must be greater than zero.",
+            )
+        atomic_amount = amount * (Decimal(10) ** sell_dec)
+        if atomic_amount != atomic_amount.to_integral_value():
+            return Quote(
+                self.name, from_coin, to_coin, amount, None, None,
+                error=(
+                    f"{self.name}: {from_coin} supports at most "
+                    f"{sell_dec} decimal places."
+                ),
+            )
+        sell_amount = str(int(atomic_amount))
         params = {
             "chainId": str(EVM_CHAIN_ID),
             "sellToken": sell_addr,
@@ -85,7 +102,7 @@ class ZeroExDEX(SwapProvider):
                          error=str(e))
         buy_amount = _dec(data.get("buyAmount"))
         _, buy_dec = EVM_TOKENS[to_coin]
-        est = (buy_amount / (10 ** buy_dec)) if buy_amount is not None else None
+        est = (buy_amount / (Decimal(10) ** buy_dec)) if buy_amount is not None else None
         rate = (est / amount) if (est is not None and amount) else None
         sources = data.get("sources") or []
         via = ", ".join(s.get("name", "") for s in sources
@@ -106,4 +123,4 @@ class ZeroExDEX(SwapProvider):
     def get_status(self, order_id) -> str:
         return STATUS_UNKNOWN
 
-
+# Fixed by j2sec
