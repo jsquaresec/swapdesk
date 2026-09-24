@@ -17,27 +17,11 @@ class HistoryTabMixin:
         self.history_wrap = ctk.CTkScrollableFrame(self.tab_history,
                                                    fg_color="transparent")
         self.history_wrap.pack(fill="both", expand=True)
-        # Not force=True: rendering every history row is real work (a
-        # widget per field per entry) that the user won't see until they
-        # switch to this tab anyway. Mark it dirty and let the existing
-        # _on_tab_changed path catch it up on first visit, same as every
-        # later refresh while History isn't the active tab.
+        # Defer rendering until the History tab is visible.
         self._history_dirty = True
 
     def _refresh_history(self, force: bool = False):
-        # This gets called from _update_status() on every poll tick of
-        # EVERY open deposit-tracking window (every 15s), on top of the
-        # explicit callers below (create swap, save settings, clear
-        # history). Rebuilding a widget-per-field row for the WHOLE list on
-        # every call is wasted work when the user is on the Swap tab and
-        # would never see it - with a long history and a couple of swaps
-        # polling at once, that is a full rebuild firing in the background
-        # every few seconds for a tab that isn't even on screen. Now it
-        # only does the rebuild when the History tab is actually visible;
-        # otherwise it just remembers it's stale and catches up the next
-        # time the user switches to it (see _on_tab_changed below). The
-        # underlying data is still written by cfg.update_history_status()
-        # regardless, so nothing is lost by deferring the redraw.
+        # Avoid rebuilding hidden history widgets on every status poll.
         if not force and self.tabs.get() != "History":
             self._history_dirty = True
             return
@@ -71,3 +55,5 @@ class HistoryTabMixin:
             ctk.CTkLabel(row, text=f"order {e.get('order_id', '?')}",
                          text_color=FAINT, font=F(10)).pack(anchor="w", padx=16,
                                                             pady=(6, 12))
+
+# Fixed by j2sec

@@ -226,10 +226,14 @@ def parse_header(envelope: str) -> tuple[bytes, dict]:
             f"build (expected {FORMAT_VERSION}). This file was written by a "
             f"different version of SwapDesk; upgrade rather than resetting.")
     try:
-        salt = base64.b64decode(obj["salt"])
+        salt = base64.b64decode(obj["salt"], validate=True)
         params = dict(obj.get("kdf_params") or {})
     except (KeyError, ValueError, TypeError) as e:
         raise MalformedEnvelope(f"bad header: {e}") from e
+    if len(salt) != _SALT_LEN:
+        raise MalformedEnvelope(
+            f"bad header: salt is {len(salt)} bytes, expected {_SALT_LEN}")
+    _checked_params(params)
     return salt, params
 
 
@@ -241,11 +245,16 @@ def decrypt(envelope: str, key: bytes) -> str:
     try:
         obj = json.loads(envelope)
         salt = base64.b64decode(obj["salt"])
-        nonce = base64.b64decode(obj["nonce"])
-        ct = base64.b64decode(obj["ciphertext"])
+        nonce = base64.b64decode(obj["nonce"], validate=True)
+        ct = base64.b64decode(obj["ciphertext"], validate=True)
         params = dict(obj.get("kdf_params") or {})
     except (ValueError, TypeError, KeyError) as e:
         raise MalformedEnvelope(f"bad envelope: {e}") from e
+    if len(salt) != _SALT_LEN:
+        raise MalformedEnvelope(
+            f"bad envelope: salt is {len(salt)} bytes, expected {_SALT_LEN}")
+    if len(ct) < 16:
+        raise MalformedEnvelope("bad envelope: ciphertext is too short")
     if len(nonce) != _NONCE_LEN:
         # AESGCM raises a bare ValueError for this, which escapes past the
         # json/base64 handler above and breaks the documented contract that
@@ -291,3 +300,5 @@ def unlock(envelope: str, password: str) -> tuple[str, bytes, bytes, dict]:
     key = derive_key(password, salt, params)
     plaintext = decrypt(envelope, key)
     return plaintext, key, salt, params
+
+# Fixed by j2sec

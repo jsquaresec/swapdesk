@@ -91,11 +91,17 @@ def verify_is_tor(proxy_url: str, timeout: int = 10) -> bool | None:
     """
     try:
         import requests
-        r = requests.get("https://check.torproject.org/api/ip",
-                         proxies={"http": proxy_url, "https": proxy_url},
-                         timeout=timeout)
+        r = requests.get(
+            "https://check.torproject.org/api/ip",
+            proxies={"http": proxy_url, "https": proxy_url},
+            timeout=timeout,
+            allow_redirects=False,
+        )
+        r.raise_for_status()
         data = r.json()
     except Exception:  # noqa: BLE001 - any failure means "could not tell"
         return None
     value = data.get("IsTor") if isinstance(data, dict) else None
     return bool(value) if isinstance(value, bool) else None
+
+# Fixed by j2sec
